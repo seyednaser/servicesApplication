@@ -18,5 +18,7 @@ public class MainActivity extends Activity {
 
     public void onStartService(View view) {
         Intent intent = new Intent(this, DelayedMessageService.class);
+        intent.putExtra("message", "Notification Starting");
+        startService(intent);
     }
 }

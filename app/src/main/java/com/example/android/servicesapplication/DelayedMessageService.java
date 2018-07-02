@@ -1,7 +1,9 @@
 package com.example.android.servicesapplication;
 
 import android.app.IntentService;
+import android.app.NotificationManager;
 import android.content.Intent;
+import android.support.v4.app.NotificationCompat;
 
 
 /**
@@ -11,14 +13,6 @@ import android.content.Intent;
  * TODO: Customize class - update intent actions and extra parameters.
  */
 public class DelayedMessageService extends IntentService {
-    // TODO: Rename actions, choose action names that describe tasks that this
-    // IntentService can perform, e.g. ACTION_FETCH_NEW_ITEMS
-    public static final String ACTION_FOO = "com.example.android.servicesapplication.action.FOO";
-    public static final String ACTION_BAZ = "com.example.android.servicesapplication.action.BAZ";
-
-    // TODO: Rename parameters
-    public static final String EXTRA_PARAM1 = "com.example.android.servicesapplication.extra.PARAM1";
-    public static final String EXTRA_PARAM2 = "com.example.android.servicesapplication.extra.PARAM2";
 
     public DelayedMessageService() {
         super("DelayedMessageService");
@@ -26,35 +20,29 @@ public class DelayedMessageService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        if (intent != null) {
-            final String action = intent.getAction();
-            if (ACTION_FOO.equals(action)) {
-                final String param1 = intent.getStringExtra(EXTRA_PARAM1);
-                final String param2 = intent.getStringExtra(EXTRA_PARAM2);
-                handleActionFoo(param1, param2);
-            } else if (ACTION_BAZ.equals(action)) {
-                final String param1 = intent.getStringExtra(EXTRA_PARAM1);
-                final String param2 = intent.getStringExtra(EXTRA_PARAM2);
-                handleActionBaz(param1, param2);
+
+        synchronized (this){
+            try {
+                wait(10000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         }
+
+        String text = intent.getStringExtra("message");
+        showText(text);
     }
 
-    /**
-     * Handle action Foo in the provided background thread with the provided
-     * parameters.
-     */
-    private void handleActionFoo(String param1, String param2) {
-        // TODO: Handle action Foo
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
+    private void showText(String text) {
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
+                .setSmallIcon(android.R.drawable.sym_def_app_icon)
+                .setContentTitle("Showing text")
+                .setContentText(text)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setVibrate(new long[] {0, 1000})
+                .setAutoCancel(true);
 
-    /**
-     * Handle action Baz in the provided background thread with the provided
-     * parameters.
-     */
-    private void handleActionBaz(String param1, String param2) {
-        // TODO: Handle action Baz
-        throw new UnsupportedOperationException("Not yet implemented");
+        NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        notificationManager.notify(670, builder.build());
     }
 }
